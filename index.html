@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FloraLens — Ensiklopedia Tumbuhan Laboratorium Biologi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ===== DESIGN TOKENS ===== */
+:root {
+  --bg: #F7F9F4;
+  --surface: #FFFFFF;
+  --surface-alt: #EFF4EA;
+  --border: #D4E2C8;
+  --text-primary: #1A2E14;
+  --text-secondary: #4A6741;
+  --text-muted: #7A9470;
+  --accent: #2D6A2E;
+  --accent-light: #4CAF50;
+  --accent-pale: #C8E6C9;
+  --accent-dark: #1B4332;
+  --shadow-sm: 0 1px 3px rgba(26,46,20,.07), 0 1px 2px rgba(26,46,20,.05);
+  --shadow-md: 0 4px 16px rgba(26,46,20,.10), 0 2px 6px rgba(26,46,20,.06);
+  --shadow-lg: 0 20px 48px rgba(26,46,20,.14), 0 8px 16px rgba(26,46,20,.08);
+  --radius: 14px;
+  --radius-sm: 8px;
+  --transition: 240ms cubic-bezier(.4,0,.2,1);
+}
+[data-theme="dark"] {
+  --bg: #0D1A0D;
+  --surface: #152015;
+  --surface-alt: #1C2E1C;
+  --border: #2A3D2A;
+  --text-primary: #E8F5E3;
+  --text-secondary: #A5C99A;
+  --text-muted: #6B9B62;
+  --accent: #66BB6A;
+  --accent-light: #81C784;
+  --accent-pale: #1B3A1B;
+  --accent-dark: #A5D6A7;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.3);
+  --shadow-md: 0 4px 16px rgba(0,0,0,.4);
+  --shadow-lg: 0 20px 48px rgba(0,0,0,.5);
+}
+
+/* ===== RESET ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+  display: flex;
+  flex-direction: column;
+}
+img { display: block; max-width: 100%; }
+button { cursor: pointer; font-family: inherit; border: none; }
+
+/* ===== MENCOLOK & INTERESTING HEADER ===== */
+.header {
+  position: sticky; top: 0; z-index: 100;
+  background: linear-gradient(135deg, #1b4332 0%, #2d6a2e 100%);
+  border-bottom: 2px solid #4caf50;
+  box-shadow: var(--shadow-md);
+  transition: background var(--transition);
+}
+.header-inner {
+  max-width: 1380px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 76px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.logo {
+  display: flex; align-items: center; gap: 12px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.logo-icon {
+  width: 42px; height: 42px;
+  background: #4caf50;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.logo-text { display: flex; flex-direction: column; line-height: 1.1; }
+.logo-main {
+  font-family: 'Playfair Display', serif;
+  font-weight: 800;
+  font-size: 22px;
+  color: #FFFFFF;
+  letter-spacing: 0.5px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+.logo-sub {
+  font-size: 11px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: #C8E6C9;
+  font-weight: 600;
+  margin-top: 2px;
+}
+.header-center { flex: 1; display: flex; justify-content: center; transition: opacity 0.3s; }
+.search-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+}
+.search-icon {
+  position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+  color: #C8E6C9;
+  pointer-events: none;
+  font-size: 15px;
+}
+#searchInput {
+  width: 100%;
+  padding: 12px 16px 12px 44px;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  border-radius: 26px;
+  background: rgba(255,255,255,0.15);
+  color: #FFFFFF;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: all var(--transition);
+}
+#searchInput:focus {
+  border-color: #FFFFFF;
+  box-shadow: 0 0 0 4px rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.25);
+}
+#searchInput::placeholder { color: rgba(200,230,201,0.7); }
+.header-actions { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+
+/* Action Button Style */
+.add-btn-trigger {
+  padding: 10px 16px;
+  background: #4caf50;
+  color: #fff;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  transition: all var(--transition);
+}
+.add-btn-trigger:hover {
+  background: #fff;
+  color: var(--accent-dark);
+  transform: translateY(-2px);
+}
+
+.icon-btn {
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  color: #FFFFFF;
+  transition: all var(--transition);
+}
+.icon-btn:hover { background: #FFFFFF; color: var(--accent-dark); transform: scale(1.05); }
+
+/* ===== HERO ===== */
+.hero {
+  background: linear-gradient(135deg, var(--accent-dark) 0%, var(--accent) 60%, var(--accent-light) 100%);
+  padding: 52px 24px 44px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+[data-theme="dark"] .hero {
+  background: linear-gradient(135deg, #0D2210 0%, #1B3A1B 60%, #2D5A2D 100%);
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,.15);
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.9);
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(32px, 5vw, 52px);
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.12;
+  margin-bottom: 12px;
+}
+.hero h1 em { font-style: italic; opacity: .85; }
+.hero-desc {
+  font-size: 15px;
+  color: rgba(255,255,255,.75);
+  max-width: 640px;
+  margin: 0 auto 28px;
+  line-height: 1.65;
+}
+.hero-stats {
+  display: flex; justify-content: center; gap: 36px;
+  flex-wrap: wrap;
+}
+.stat {
+  display: flex; flex-direction: column; align-items: center;
+}
+.stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+}
+.stat-label {
+  font-size: 11px;
+  color: rgba(255,255,255,.65);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+
+/* ===== MAIN CONTAINER ===== */
+.main {
+  max-width: 1380px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+  flex: 1;
+  width: 100%;
+}
+.view-section {
+  display: none;
+}
+.view-section.active-view {
+  display: block;
+}
+
+.result-info {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.result-count {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.result-count strong { color: var(--text-primary); }
+
+/* ===== GRID ===== */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+/* ===== CARD ===== */
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+  cursor: pointer;
+  display: flex; flex-direction: column;
+}
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent-light);
+}
+.card-img-wrap {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+  background: var(--surface-alt);
+}
+.card-img-wrap img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 400ms cubic-bezier(.4,0,.2,1);
+}
+.card:hover .card-img-wrap img { transform: scale(1.06); }
+
+.card-body {
+  padding: 18px;
+  display: flex; flex-direction: column; flex: 1;
+}
+.card-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  line-height: 1.25;
+}
+.card-sci {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+.card-btn {
+  margin-top: auto;
+  padding: 10px 16px;
+  background: var(--surface-alt);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--accent);
+  width: 100%;
+  transition: all var(--transition);
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.card-btn:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 80px 24px;
+  color: var(--text-muted);
+}
+.empty-state .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: .5; }
+.empty-state h3 { font-size: 18px; color: var(--text-secondary); margin-bottom: 6px; }
+
+/* ===== STANDALONE DETAIL & MANAGEMENT PAGE ===== */
+.detail-container, .form-container {
+  max-width: 960px;
+  margin: 0 auto;
+  background: var(--surface);
+  border-radius: 20px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  animation: fadeUp 0.4s ease forwards;
+}
+.form-container {
+  padding: 36px;
+}
+.detail-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 10px;
+  margin-bottom: 24px;
+  text-decoration: none;
+  transition: all var(--transition);
+}
+.detail-back-btn:hover {
+  background: var(--accent-pale);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.detail-hero {
+  position: relative;
+  height: 380px;
+  background: var(--surface-alt);
+}
+.detail-hero img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.detail-hero-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 70%);
+  display: flex;
+  align-items: flex-end;
+  padding: 32px;
+}
+.detail-title-group { width: 100%; }
+.detail-title {
+  font-size: 34px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+}
+.detail-sci {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 20px;
+  color: rgba(255,255,255,.9);
+  margin-top: 4px;
+}
+.detail-body {
+  padding: 36px;
+}
+.detail-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+@media (min-width: 768px) {
+  .detail-layout { grid-template-columns: 1.2fr 1fr; }
+}
+
+/* ===== FORM STYLING ===== */
+.form-section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  color: var(--text-primary);
+  margin-bottom: 24px;
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 8px;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  margin-bottom: 28px;
+}
+@media(min-width: 640px) {
+  .form-grid { grid-template-columns: 1fr 1fr; }
+  .full-width-form { grid-column: span 2; }
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.form-group input, .form-group textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-alt);
+  color: var(--text-primary);
+  font-size: 14px;
+  outline: none;
+  font-family: inherit;
+  transition: all var(--transition);
+}
+.form-group input:focus, .form-group textarea:focus {
+  border-color: var(--accent);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px var(--accent-pale);
+}
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+.form-actions-bar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  border-top: 1px dashed var(--border);
+  padding-top: 20px;
+}
+.submit-btn {
+  padding: 12px 24px;
+  background: var(--accent);
+  color: white;
+  font-weight: 600;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: background var(--transition);
+}
+.submit-btn:hover { background: var(--accent-dark); }
+
+/* ===== ACCORDION ===== */
+.accordion { display: flex; flex-direction: column; gap: 14px; }
+.accordion-item {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--surface);
+  transition: border-color var(--transition);
+}
+.accordion-item.open { border-color: var(--accent); }
+.accordion-header {
+  padding: 16px 20px;
+  background: var(--surface-alt);
+  display: flex; align-items: center; justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--transition);
+}
+.accordion-item.open .accordion-header { background: var(--accent-pale); }
+.accordion-hdr-left { display: flex; align-items: center; gap: 10px; }
+.accordion-icon { font-size: 18px; }
+.accordion-hdr-title { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+.accordion-chevron {
+  font-size: 12px;
+  color: var(--text-muted);
+  transition: transform var(--transition);
+}
+.accordion-item.open .accordion-chevron { transform: rotate(180deg); }
+.accordion-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 380ms cubic-bezier(.4,0,.2,1);
+}
+.accordion-body-inner { padding: 20px; }
+
+/* Classification table */
+.klasifikasi-table { width: 100%; border-collapse: collapse; }
+.klasifikasi-table tr:not(:last-child) td { border-bottom: 1px solid var(--border); }
+.klasifikasi-table td {
+  padding: 10px 6px;
+  font-size: 14px;
+  vertical-align: middle;
+}
+.klasifikasi-table .rank {
+  color: var(--text-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-weight: 600;
+  width: 120px;
+}
+.klasifikasi-table .value {
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13.5px;
+}
+
+/* Ciri / Keunikan */
+.feature-list { display: flex; flex-direction: column; gap: 10px; }
+.feature-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+.feature-bullet {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+  margin-top: 8px;
+}
+
+/* QR Card Utility */
+.qr-card {
+  background: var(--surface-alt);
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: max-content;
+}
+.qr-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+.qr-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+.qr-placeholder {
+  width: 150px;
+  height: 150px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+}
+
+/* ===== CREDIT & FOOTER ===== */
+.footer {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 32px 24px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: auto;
+}
+.footer strong { color: var(--text-secondary); }
+.credit-section {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border);
+  font-size: 12px;
+}
+.credit-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface-alt);
+  padding: 4px 12px;
+  border-radius: 20px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  border: 1px solid var(--border);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .header-inner { height: auto; flex-wrap: wrap; padding: 12px 16px; gap: 12px; }
+  .header-center { order: 3; width: 100%; min-width: 100%; }
+}
+@media (max-width: 640px) {
+  .hero { padding: 36px 20px 32px; }
+  .hero-stats { gap: 24px; }
+  .main { padding: 24px 16px 48px; }
+  .grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+  .detail-hero { height: 240px; }
+  .detail-title { font-size: 26px; }
+  .logo-sub { display: none; }
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.card { animation: fadeUp .35s ease both; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <a class="logo" href="#" onclick="navigateToDashboard(event)">
+      <div class="logo-icon">🌿</div>
+      <div class="logo-text">
+        <span class="logo-main">FloraLens</span>
+        <span class="logo-sub">Plant Encyclopedia</span>
+      </div>
+    </a>
+    <div class="header-center" id="searchHeaderContainer">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Cari tanaman, nama ilmiah…" autocomplete="off">
+      </div>
+    </div>
+    <div class="header-actions">
+      <a href="#add" class="add-btn-trigger" id="addPlantMenuBtn"><span>➕</span> Tambah Spesies</a>
+      <button class="icon-btn" id="themeToggle" title="Toggle dark mode">🌙</button>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+
+  <div id="dashboardView" class="view-section active-view">
+    <section class="hero" style="border-radius: var(--radius); margin-bottom: 24px;">
+      <div class="hero-eyebrow">🌱 Database Botani Digital</div>
+      <h1>Ensiklopedia<br><em>Klasifikasi Tumbuhan</em></h1>
+      <p class="hero-desc">🌿 Selamat Datang di Ensiklopedia Tumbuhan Laboratorium Biologi. Media informasi digital yang dirancang untuk membantu pengguna mengenal berbagai spesies tumbuhan yang terdapat di Laboratorium Biologi. Setiap koleksi dilengkapi dengan klasifikasi ilmiah, karakteristik morfologi, habitat, serta keunikan yang dapat menunjang proses pembelajaran, praktikum, dan penelitian di bidang biologi.</p>
+      <div class="hero-stats">
+        <div class="stat"><span class="stat-num" id="statTotal">16</span><span class="stat-label">Spesies</span></div>
+        <div class="stat"><span class="stat-num">1</span><span class="stat-label">Kingdom</span></div>
+        <div class="stat"><span class="stat-num" id="statVarietas">16</span><span class="stat-label">Varietas</span></div>
+      </div>
+    </section>
+
+    <div class="result-info">
+      <span class="result-count">Menampilkan <strong id="showCount">16</strong> dari <strong id="totalCount">16</strong> spesies</span>
+    </div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div id="detailView" class="view-section">
+    <a href="#" class="detail-back-btn" onclick="navigateToDashboard(event)">← Kembali ke Dashboard</a>
+    
+    <div class="detail-container">
+      <div class="detail-hero">
+        <img id="detailImg" src="" alt="">
+        <div class="detail-hero-overlay">
+          <div class="detail-title-group">
+            <div class="detail-title" id="detailTitle"></div>
+            <div class="detail-sci" id="detailSci"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="detail-body">
+        <div class="detail-layout">
+          <div class="accordion" id="accordion">
+            
+            <div class="accordion-item open" data-idx="0">
+              <div class="accordion-header">
+                <div class="accordion-hdr-left">
+                  <span class="accordion-icon">📂</span>
+                  <span class="accordion-hdr-title">Klasifikasi Taksonomi</span>
+                </div>
+                <span class="accordion-chevron">▼</span>
+              </div>
+              <div class="accordion-body" style="max-height: 500px;">
+                <div class="accordion-body-inner">
+                  <table class="klasifikasi-table" id="klasTable"></table>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item" data-idx="1">
+              <div class="accordion-header">
+                <div class="accordion-hdr-left">
+                  <span class="accordion-icon">🌿</span>
+                  <span class="accordion-hdr-title">Karakteristik Morfologi</span>
+                </div>
+                <span class="accordion-chevron">▼</span>
+              </div>
+              <div class="accordion-body">
+                <div class="accordion-body-inner">
+                  <div class="feature-list" id="ciriList"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item" data-idx="2">
+              <div class="accordion-header">
+                <div class="accordion-hdr-left">
+                  <span class="accordion-icon">💡</span>
+                  <span class="accordion-hdr-title">Keunikan & Fakta Menarik</span>
+                </div>
+                <span class="accordion-chevron">▼</span>
+              </div>
+              <div class="accordion-body">
+                <div class="accordion-body-inner">
+                  <div class="feature-list" id="unikList"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="qr-card">
+            <div class="qr-title">Tautan QR Code Lab</div>
+            <div class="qr-desc">Cetak QR code ini dan tempelkan pada pot fisik tanaman di Laboratorium Biologi untuk akses praktikum cepat praktikan.</div>
+            <div class="qr-placeholder" id="qrContainer"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="addView" class="view-section">
+    <a href="#" class="detail-back-btn" onclick="navigateToDashboard(event)">← Batal dan Kembali</a>
+    
+    <div class="form-container">
+      <h2 class="form-section-title">Formulir Pendaftaran Spesies Baru</h2>
+      <form id="addPlantForm" onsubmit="handleFormSubmit(event)">
+        
+        <h3 style="font-size:15px; margin-bottom:12px; color:var(--accent);">ℹ️ Informasi Identitas Umum</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="p_name">Nama Lokal Tanaman *</label>
+            <input type="text" id="p_name" required placeholder="Contoh: Lidah Buaya">
+          </div>
+          <div class="form-group">
+            <label for="p_sci">Nama Ilmiah (Spesies) *</label>
+            <input type="text" id="p_sci" required placeholder="Contoh: Aloe vera (L.) Burm.f.">
+          </div>
+          <div class="form-group full-width-form">
+            <label for="p_img">Tautan Gambar (URL) *</label>
+            <input type="url" id="p_img" required placeholder="Masukkan tautan gambar HD dari Unsplash/Internet">
+          </div>
+        </div>
+
+        <h3 style="font-size:15px; margin-bottom:12px; color:var(--accent);">📂 Klasifikasi Linnaeus Tingkat Tinggi</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="k_king">Kingdom</label>
+            <input type="text" id="k_king" value="Plantae">
+          </div>
+          <div class="form-group">
+            <label for="k_phy">Phylum / Filum / Divisi</label>
+            <input type="text" id="k_phy" placeholder="Contoh: Tracheophyta">
+          </div>
+          <div class="form-group">
+            <label for="k_class">Class / Kelas</label>
+            <input type="text" id="k_class" placeholder="Contoh: Liliopsida">
+          </div>
+          <div class="form-group">
+            <label for="k_order">Order / Ordo</label>
+            <input type="text" id="k_order" placeholder="Contoh: Asparagales">
+          </div>
+          <div class="form-group">
+            <label for="k_fam">Family / Famili</label>
+            <input type="text" id="k_fam" placeholder="Contoh: Asphodelaceae">
+          </div>
+          <div class="form-group">
+            <label for="k_gen">Genus</label>
+            <input type="text" id="k_gen" placeholder="Contoh: Aloe L.">
+          </div>
+        </div>
+
+        <h3 style="font-size:15px; margin-bottom:12px; color:var(--accent);">📝 Deskripsi Laboratorium</h3>
+        <div class="form-grid">
+          <div class="form-group full-width-form">
+            <label for="p_ciri">Karakteristik Morfologi (Gunakan baris baru untuk setiap poin ciri)</label>
+            <textarea id="p_ciri" placeholder="Masukkan detail ciri fisik tanaman...&#10;Tekan Enter untuk poin baru."></textarea>
+          </div>
+          <div class="form-group full-width-form">
+            <label for="p_unik">Keunikan & Fakta Menarik (Gunakan baris baru untuk setiap poin keunikan)</label>
+            <textarea id="p_unik" placeholder="Masukkan fakta unik atau potensi medis tanaman...&#10;Tekan Enter untuk poin baru."></textarea>
+          </div>
+        </div>
+
+        <div class="form-actions-bar">
+          <button type="button" class="detail-back-btn" style="margin-bottom:0" onclick="navigateToDashboard(event)">Batal</button>
+          <button type="submit" class="submit-btn">Simpan ke Database</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</main>
+
+<footer class="footer">
+  <div>
+    <strong>Flora Botanica</strong> — Ensiklopedia Klasifikasi Tumbuhan · Data bersumber dari literatur botani ilmiah
+  </div>
+  <div class="credit-section">
+    <span class="credit-badge">👨‍💻 Dikembangkan oleh Hilda Sofy Ropiah</span>
+  </div>
+</footer>
+
+<script>
+/* ===================================================
+   PLANT DATABASE — 16 DATA AWAL
+=================================================== */
+const initialPlants = [
+  {
+    id: 1,
+    name: "Bakung Perdamaian", sci: "Spathiphyllum abelianum",
+    img: "https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=800&auto=format&fit=crop&q=70",
+    klasifikasi: { Kingdom:"Plantae", Phylum:"Tracheophyta", Class:"Liliopsida", Order:"Alismatales", Family:"Araceae", Genus:"Spathiphyllum Schott", Species:"Spathiphyllum abelianum A. Rojas & J.M.Chaves" },
+    ciri: ["Spathiphyllum abelianum merupakan tumbuhan herba tahunan yang memiliki daun tunggal berwarna hijau tua mengilap dengan bentuk lanset hingga elips.","Daunnya tumbuh langsung dari pangkal batang sehingga tampak membentuk rumpun.","Bunga tersusun atas tongkol bunga (spadiks) berwarna krem hingga putih yang dikelilingi oleh seludang bunga (spata) berwarna putih.","Tanaman ini menyukai lingkungan yang teduh, lembap, dan memiliki drainase yang baik."],
+    unik: ["Tanaman ini dikenal sebagai salah satu tanaman hias yang efektif membantu meningkatkan kualitas udara dalam ruangan dengan menyerap beberapa polutan seperti formaldehida dan benzena.","Selain itu, bunga putihnya yang elegan memberikan nilai estetika tinggi sehingga banyak digunakan sebagai penghias ruangan, kantor, maupun taman.","Kemampuannya bertahan pada intensitas cahaya rendah menjadikannya salah satu tanaman indoor yang populer."]
+  },
+  {
+    id: 2,
+    name: "Paku Tunggak", sci: "Dicksonia karsteniana",
+    img: "https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=800&auto=format&fit=crop&q=70",
+    klasifikasi: { Kingdom:"Plantae", Phylum:"Tracheophyta", Class:"Polypodiopsida", Order:"Cyatheales", Family:"Dicksoniaceae", Genus:"Dicksonia", Species:"Dicksonia karsteniana (Klotzsch) T.Moore" },
+    ciri: ["Dicksonia karsteniana termasuk kelompok paku pohon yang memiliki batang tegak menyerupai pohon kecil.","Batangnya tersusun oleh akar-akar adventif yang rapat sehingga tampak tebal dan kokoh.","Daunnya berukuran besar, majemuk menyirip, dan membentuk tajuk menyerupai payung.","Seperti tumbuhan paku pada umumnya, reproduksinya berlangsung melalui pembentukan spora yang terdapat pada permukaan bawah daun."],
+    unik: ["Spesies ini merupakan salah satu perwakilan tumbuhan paku purba yang telah bertahan sejak jutaan tahun lalu.","Keberadaannya sering dijadikan indikator lingkungan yang lembap dan masih alami.","Bentuknya yang menyerupai pohon memberikan kesan eksotis sehingga banyak dimanfaatkan sebagai koleksi kebun botani dan taman konservasi."]
+  },
+  {
+    id: 3,
+    name: "Sirih Merah", sci: "Piper ornatum",
+    img: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&auto=format&fit=crop&q=70",
+    klasifikasi: { Kingdom:"Plantae", Phylum:"Tracheophyta", Class:"Magnoliopsida", Order:"Piperales", Family:"Piperaceae", Genus:"Piper L.", Species:"Piper ornatum N.E.Br." },
+    ciri: ["Tanaman ini merupakan tumbuhan merambat dari famili Piperaceae yang memiliki batang lunak dan ruas-ruas yang jelas.","Daunnya berbentuk jantung dengan permukaan mengilap serta dihiasi corak hijau tua, perak, dan merah muda pada tulang daun.","Sistem perakarannya mampu tumbuh pada media yang lembap dan kaya bahan organik."],
+    unik: ["Keindahan corak daunnya menjadikan tanaman ini sangat diminati sebagai tanaman hias.","Selain nilai estetikanya, beberapa spesies dalam genus Piper diketahui memiliki kandungan metabolit sekunder yang berpotensi sebagai antibakteri dan antioksidan.","Tanaman ini juga mudah diperbanyak melalui stek batang."]
+  },
+  {
+    id: 4,
+    name: "Tutup", sci: "Macaranga tanarius",
+    img: "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=800&auto=format&fit=crop&q=70",
+    klasifikasi: { Kingdom:"Plantae", Phylum:"Tracheophyta", Class:"Magnoliopsida", Order:"Malpighiales", Family:"Euphorbiaceae", Genus:"Macaranga Thouars", Species:"Macaranga tanarius (L.) Müll.Arg." },
+    ciri: ["Macaranga tanarius merupakan pohon pionir yang dapat tumbuh hingga mencapai tinggi sekitar 10–20 meter.","Daunnya besar, berbentuk bundar hingga menjantung dengan tangkai panjang.","Permukaan daun bagian bawah sering kali tertutup lapisan lilin tipis berwarna keputihan.","Buahnya berbentuk kapsul kecil yang mengandung biji."],
+    unik: ["Tanaman ini sering menjadi spesies pertama yang tumbuh pada lahan terbuka atau bekas gangguan seperti kebakaran dan penebangan hutan.","Daunnya menyediakan tempat hidup bagi koloni semut yang membantu melindungi tanaman dari serangan serangga herbivora.","Karena kemampuannya tumbuh cepat, spesies ini berperan penting dalam proses suksesi ekologi."]
+  },
+  {
+    id: 5,
+    name: "Sirih Hutan", sci: "Piper aduncum",
+    img: "https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=800&auto=format&fit=crop&q=70",
+    klasifikasi: { Kingdom:"Plantae", Phylum:"Tracheophyta", Class:"Magnoliopsida", Order:"Piperales", Family:"Piperaceae", Genus:"Piper L.", Species:"Piper aduncum L." },
+    ciri: ["Tanaman ini berupa semak atau pohon kecil dengan daun berbentuk lonjong dan ujung meruncing.","Bunganya tersusun dalam bentuk bulir memanjang berwarna putih kehijauan.","Daunnya memiliki aroma khas saat diremas akibat kandungan minyak atsiri."],
+    unik: ["Daun dan bagian lainnya mengandung senyawa aktif yang bersifat antibakteri, antijamur, dan insektisida alami.","Dalam berbagai daerah, tanaman ini dimanfaatkan sebagai obat tradisional untuk mengatasi luka dan infeksi ringan.","Kemampuannya tumbuh cepat juga membuatnya sering ditemukan pada lahan terganggu."]
+  },
+  {
+    id: 6,
+    name: "Miana", sci: "Plectranthus monostachyus",
+    img: "https://images.unsplash.com/photo-1600100397608-f010e4fffa09?w=800&auto=format&fit=crop&q=70",
+    klasifikasi: { Kingdom:"Plantae", Phylum:"Tracheophyta", Class:"Magnoliopsida", Order:"Lamiales", Family:"Lamiaceae", Genus:"Coleus Lour.", Species:"Plectranthus monostachyus (P.Beauv.) B.J.Pollard" },
+    ciri: ["Tumbuhan herba ini memiliki batang bersegi khas anggota famili Lamiaceae.","Daunnya tersusun berhadapan, berbentuk oval hingga lonjong, dan memiliki tepi bergerigi.","Ketika diremas, daun mengeluarkan aroma khas karena mengandung minyak atsiri."],
+    unik: ["Selain sebagai tanaman liar, spesies ini banyak dimanfaatkan dalam pengobatan tradisional karena dipercaya memiliki aktivitas antiinflamasi dan antimikroba.","Aromanya yang khas juga dapat membantu mengusir beberapa jenis serangga."]
+  },
+  {
+    id: 7,
+    name: "Jeruk Kasturi", sci: "Citrus microcarpa",
+    img: "https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?w=800&auto=format&fit=crop&q=70",
+    klasifikasi: { Kingdom:"Plantae", Divisi:"Magnoliophyta (Tumbuhan berbunga)", Kelas:"Magnoliopsida (Dicotyledonae)", Ordo:"Sapindales (Rutales)", Famili:"Rutaceae", Genus:"Citrus", Spesies:"Citrus microcarpa" },
+    ciri: ["Pohon kecil dengan percabangan rapat dan daun hijau mengilap.","Buahnya berbentuk bulat kecil dengan kulit tipis yang berubah warna dari hijau menjadi kuning atau jingga saat matang.","Daging buah mengandung banyak air dan memiliki rasa sangat asam."],
+    unik: ["Buah kalamansi kaya vitamin C, antioksidan, dan asam sitrat.","Selain digunakan sebagai bahan makanan dan minuman, sari buahnya sering dimanfaatkan sebagai pembersih alami serta bahan dalam produk kesehatan tradisional."]
+  },
+  {
+    id: 8,
+    name: "Kaca Piring", sci: "Gardenia jasminoides",
+    img: "https://images.unsplash.com/photo-1534710951216-45c3766de3f0?w=800&auto=format&fit=crop&q=70",
+    klasifikasi: { Kingdom:"Plantae", Phylum:"Tracheophyta", Class:"Magnoliopsida", Order:"Gentianales", Family:"Rubiaceae", Genus:"Gardenia J.Ellis", Species:"Gardenia jasminoides J.Ellis" },
+    ciri: ["Merupakan tanaman perdu dengan daun hijau tua mengilap yang tersusun berhadapan.","Bunganya berwarna putih, berukuran cukup besar, dan memiliki banyak mahkota.","Tanaman ini tumbuh baik pada daerah tropis hingga subtropis."],
+    unik: ["Aroma bunga yang sangat harum menjadikannya populer sebagai tanaman hias.","Di beberapa negara Asia, buahnya digunakan sebagai pewarna alami makanan dan bahan pengobatan tradisional."]
+  },
+  {
+    id: 9,
+    name: "Daun Bahagia", sci: "Dieffenbachia seguine",
+    img: "https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=800&auto=format&fit=crop&q=70",
+    klasifikasi: { Kingdom:"Plantae", Phylum:"Tracheophyta", Class:"Liliopsida", Order:"Alismatales", Family:"Araceae", Genus:"Dieffenbachia Schott", Species:"Dieffenbachia seguine (Jacq.) Schott" },
+    ciri: ["Tanaman herba dengan batang lunak dan daun lebar bercorak hijau, putih, atau kuning.","Daunnya tersusun berseling dan memiliki ukuran yang cukup besar sehingga tampak mencolok sebagai tanaman hias."],
+    unik: ["Mengandung kristal kalsium oksalat berbentuk jarum yang dapat menyebabkan rasa terbakar dan iritasi jika tertelan.","Meskipun demikian, corak daunnya yang menarik menjadikannya salah satu tanaman hias tropis yang banyak dibudidayakan."]
+  },
+  {
+    id: 10,
+    name: "Meranti Sepat Merak", sci: "Goeppertia makoyana",
+    img: "https://images.unsplash.com/photo-1628155930542-3c7a64e2c833?w=800&auto=format&fit=crop&q=70",
+    klasifikasi: { Kingdom:"Plantae", Phylum:"Tracheophyta", Class:"Liliopsida", Order:"Zingiberales", Family:"Marantaceae", Genus:"Goeppertia Nees", Species:"Goeppertia makoyana (É.Morren) Borchs. & S. Suárez" },
+    ciri: ["Daunnya berbentuk oval dengan pola hijau gelap menyerupai bulu merak.","Bagian bawah daun berwarna ungu kemerahan.","Tanaman ini tumbuh baik pada lingkungan yang lembap dan teduh."],
+    unik: ["Daunnya dapat bergerak mengikuti perubahan cahaya melalui fenomena niktinasti, yaitu membuka pada siang hari dan sedikit menutup pada malam hari.","Corak daunnya yang unik membuatnya sangat diminati sebagai tanaman hias."]
+  },
+  {
+    id: 11,
+    name: "Hanjuang", sci: "Cordyline fruticosa",
+    img: "https://images.unsplash.com/photo-1507269558414-992d70ec2308?w=800&auto=format&fit=crop&q=70",
+    klasifikasi: { Kingdom:"Plantae", Filum:"Tracheophyta", Kelas:"Liliopsida", Ordo:"Asparagales", Famili:"Asparagaceae", Genus:"Cordyline", Spesies:"Cordyline fruticosa (L.) A.Chev." },
+    ciri: ["Tanaman perdu dengan daun memanjang yang dapat berwarna hijau, merah, merah muda, ungu, atau kombinasi berbagai warna.","Batangnya tegak dan dapat bercabang."],
+    unik: ["Di berbagai daerah Indonesia, tanaman andong memiliki nilai budaya dan sering digunakan dalam upacara adat serta ritual keagamaan.","Warna daunnya yang mencolok menjadikannya tanaman lanskap yang populer."]
+  },
+  {
+    id: 12,
+    name: "Sri Rejeki", sci: "Aglaonema commutatum",
+    img: "https://images.unsplash.com/photo-1620138546344-7b2c0d03683d?w=800&auto=format&fit=crop&q=70",
+    klasifikasi: { Kingdom:"Plantae", Filum:"Tracheophyta", Kelas:"Liliopsida", Ordo:"Alismatales", Famili:"Araceae", Genus:"Aglaonema", Spesies:"Aglaonema commutatum Schott." },
+    ciri: ["Tumbuhan herba dengan daun lonjong berwarna hijau dan bercak keperakan.","Batangnya pendek dan tumbuh membentuk rumpun.","Mampu beradaptasi pada lingkungan dengan intensitas cahaya rendah."],
+    unik: ["Dijuluki 'Ratu Daun' karena memiliki corak daun yang sangat beragam dan menarik.","Tanaman ini menjadi salah satu tanaman hias terpopuler di Indonesia serta dipercaya membawa keberuntungan menurut sebagian masyarakat."]
+  },
+  {
+    id: 13,
+    name: "Pakis", sci: "Stenochlaena palustris",
+    img: "https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&auto=format&fit=crop&q=70",
+    klasifikasi: { Kingdom:"Plantae", Phylum:"Tracheophyta", Class:"Polypodiopsida", Order:"Polypodiales", Family:"Blechnaceae", Genus:"Stenochlaena J.Sm.", Species:"Stenochlaena palustris (Burm.fil.) Bedd." },
+    ciri: ["Merupakan tumbuhan paku merambat yang banyak ditemukan di daerah rawa dan hutan tropis.","Daun mudanya berwarna merah kecokelatan, sedangkan daun dewasa berwarna hijau mengilap."],
+    unik: ["Daun muda kelakai sering dikonsumsi sebagai sayuran dan diketahui mengandung zat besi, vitamin, serta antioksidan yang cukup tinggi.","Tumbuhan ini juga mampu tumbuh pada lahan yang tergenang air."]
+  },
+  {
+    id: 14,
+    name: "Tapak Liman", sci: "Elephantopus scaber",
+    img: "https://images.unsplash.com/photo-1560717789-0ac7c58ac90a?w=800&auto=format&fit=crop&q=70",
+    klasifikasi: { Kingdom:"Plantae", Phylum:"Tracheophyta", Class:"Magnoliopsida", Order:"Asterales", Family:"Asteraceae", Genus:"Elephantopus L.", Species:"Elephantopus scaber L." },
+    ciri: ["Herba tahunan dengan daun tersusun roset di bagian pangkal.","Permukaan daun kasar dan ditutupi rambut halus.","Bunganya kecil berwarna ungu dan tersusun dalam kelompok."],
+    unik: ["Sudah lama digunakan dalam pengobatan tradisional untuk membantu mengatasi demam, gangguan pencernaan, dan peradangan.","Tanaman ini juga memiliki kemampuan tumbuh pada tanah yang kurang subur."]
+  },
+  {
+    id: 15,
+    name: "Nanas Merah", sci: "Ananas comosus",
+    img: "https://images.unsplash.com/photo-1550258987-190a2d41a8ba?w=800&auto=format&fit=crop&q=70",
+    klasifikasi: { Kingdom:"Plantae", Phylum:"Tracheophyta", Class:"Liliopsida", Order:"Poales", Family:"Bromeliaceae", Genus:"Ananas Mill.", Species:"Ananas comosus (L.) Merr." },
+    ciri: ["Tumbuhan herba dengan daun panjang, tebal, dan berduri di bagian tepi.","Buah nanas terbentuk dari gabungan banyak bunga yang menyatu menjadi satu struktur besar."],
+    unik: ["Mengandung enzim bromelain yang mampu memecah protein.","Enzim ini dimanfaatkan dalam industri makanan, kesehatan, dan farmasi.","Selain itu, serat daun nanas dapat digunakan sebagai bahan baku tekstil ramah lingkungan."]
+  },
+  {
+    id: 16,
+    name: "Janda Bolong", sci: "Monstera deliciosa",
+    img: "https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=800&auto=format&fit=crop&q=70",
+    klasifikasi: { Kingdom:"Plantae", Phylum:"Tracheophyta", Class:"Liliopsida", Order:"Alismatales", Family:"Araceae", Genus:"Monstera Adans.", Species:"Monstera deliciosa Liebm." },
+    ciri: ["Tanaman merambat dengan daun besar yang memiliki lubang dan sobekan alami.","Memiliki akar udara yang membantu menempel pada pohon atau penyangga di habitat aslinya."],
+    unik: ["Lubang pada daun merupakan bentuk adaptasi yang memungkinkan cahaya menembus ke bagian bawah tanaman dan mengurangi kerusakan akibat angin kencang.","Buahnya dapat dimakan saat matang dan memiliki rasa yang sering digambarkan sebagai perpaduan nanas, pisang, dan mangga."]
+  }
+];
+
+// Sinkronisasi database agar bisa menyimpan penambahan spesies baru ke LocalStorage peramban
+let plants = JSON.parse(localStorage.getItem('flora_db')) || initialPlants;
+let searchQuery = '';
+
+window.addEventListener('hashchange', handleRouting);
+window.addEventListener('DOMContentLoaded', () => {
+  handleRouting();
+  setupEventListeners();
+});
+
+function handleRouting() {
+  const hash = window.location.hash;
+  
+  // Deteksi rute halaman
+  if (hash.startsWith('#plant-')) {
+    const id = parseInt(hash.replace('#plant-', ''));
+    renderDetailPage(id);
+  } else if (hash === '#add') {
+    renderAddPlantPage();
+  } else {
+    renderDashboardPage();
+  }
+}
+
+function navigateToDashboard(e) {
+  if(e) e.preventDefault();
+  window.location.hash = '';
+}
+
+function openPlantDetail(id) {
+  window.location.hash = `#plant-${id}`;
+}
+
+/* ===================================================
+   PAGE VIEW RENDERING MANAGEMENT
+=================================================== */
+function renderDashboardPage() {
+  // Atur visibilitas panel views
+  document.getElementById('detailView').classList.remove('active-view');
+  document.getElementById('addView').classList.remove('active-view');
+  document.getElementById('dashboardView').classList.add('active-view');
+  
+  // Tampilkan form pencarian
+  document.getElementById('searchHeaderContainer').style.opacity = "1";
+  document.getElementById('searchHeaderContainer').style.pointerEvents = "all";
+
+  const grid = document.getElementById('grid');
+  const q = searchQuery.toLowerCase();
+  const filtered = plants.filter(p => {
+    return !q || p.name.toLowerCase().includes(q) || p.sci.toLowerCase().includes(q);
+  });
+
+  // Perbarui metrik statistik di dashboard
+  document.getElementById('showCount').textContent = filtered.length;
+  document.getElementById('totalCount').textContent = plants.length;
+  document.getElementById('statTotal').textContent = plants.length;
+  document.getElementById('statVarietas').textContent = plants.length;
+
+  if(!filtered.length){
+    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">🌿</div><h3>Tidak ada tumbuhan ditemukan</h3><p>Coba kata kunci pencarian yang berbeda</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map((p, i) => `
+    <div class="card" style="animation-delay:${i*20}ms" onclick="openPlantDetail(${p.id})">
+      <div class="card-img-wrap">
+        <img src="${p.img}" alt="${p.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x200/c8e6c9/2d6a2e?text=🌿'">
+      </div>
+      <div class="card-body">
+        <div class="card-name">${p.name}</div>
+        <div class="card-sci">${p.sci}</div>
+        <button class="card-btn">
+          <span>📋</span> Lihat Detail
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderDetailPage(id) {
+  const p = plants.find(x => x.id === id);
+  if(!p) {
+    navigateToDashboard();
+    return;
+  }
+
+  document.getElementById('dashboardView').classList.remove('active-view');
+  document.getElementById('addView').classList.remove('active-view');
+  document.getElementById('detailView').classList.add('active-view');
+  
+  document.getElementById('searchHeaderContainer').style.opacity = "0";
+  document.getElementById('searchHeaderContainer').style.pointerEvents = "none";
+
+  document.getElementById('detailImg').src = p.img;
+  document.getElementById('detailImg').onerror = function(){ this.src='https://via.placeholder.com/680x240/c8e6c9/2d6a2e?text=🌿'; };
+  document.getElementById('detailTitle').textContent = p.name;
+  document.getElementById('detailSci').textContent = p.sci;
+
+  // Render tabel klasifikasi taksonomi
+  const tableContent = Object.entries(p.klasifikasi).map(([rank, val]) => `
+    <tr>
+      <td class="rank">${rank}</td>
+      <td class="value">${val || '—'}</td>
+    </tr>
+  `).join('');
+  document.getElementById('klasTable').innerHTML = tableContent;
+
+  document.getElementById('ciriList').innerHTML = p.ciri.map(c =>
+    `<div class="feature-item"><div class="feature-bullet"></div><span>${c}</span></div>`
+  ).join('');
+
+  document.getElementById('unikList').innerHTML = p.unik.map(u =>
+    `<div class="feature-item"><div class="feature-bullet"></div><span>${u}</span></div>`
+  ).join('');
+
+  // Reset keadaan akordeon ke bagian awal
+  document.querySelectorAll('.accordion-item').forEach((item, idx) => {
+    item.classList.toggle('open', idx === 0);
+    const body = item.querySelector('.accordion-body');
+    body.style.maxHeight = idx === 0 ? body.scrollHeight + 'px' : '0';
+  });
+
+  // Membuat generator QR code otomatis berbasis URL detil saat ini
+  const currentURL = window.location.href;
+  const qrContainer = document.getElementById('qrContainer');
+  qrContainer.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(currentURL)}&ecc=M" alt="QR Code Tanaman" style="width:100%; height:100%;">`;
+
+  window.scrollTo(0, 0);
+}
+
+function renderAddPlantPage() {
+  document.getElementById('dashboardView').classList.remove('active-view');
+  document.getElementById('detailView').classList.remove('active-view');
+  document.getElementById('addView').classList.add('active-view');
+  
+  document.getElementById('searchHeaderContainer').style.opacity = "0";
+  document.getElementById('searchHeaderContainer').style.pointerEvents = "none";
+  
+  document.getElementById('addPlantForm').reset();
+  window.scrollTo(0, 0);
+}
+
+/* ===================================================
+   FORM SUBMISSION ENGINE (CREATE)
+=================================================== */
+function handleFormSubmit(e) {
+  e.preventDefault();
+
+  // Memecah teks textarea per baris baru menjadi array data terstruktur
+  const ciriRaw = document.getElementById('p_ciri').value.split('\n').filter(line => line.trim() !== '');
+  const unikRaw = document.getElementById('p_unik').value.split('\n').filter(line => line.trim() !== '');
+
+  // Membuat objek entitas tanaman baru
+  const newPlant = {
+    id: Date.now(), // Generate ID unik memakai tanda waktu
+    name: document.getElementById('p_name').value.trim(),
+    sci: document.getElementById('p_sci').value.trim(),
+    img: document.getElementById('p_img').value.trim(),
+    klasifikasi: {
+      Kingdom: document.getElementById('k_king').value.trim() || 'Plantae',
+      Phylum: document.getElementById('k_phy').value.trim() || '—',
+      Class: document.getElementById('k_class').value.trim() || '—',
+      Order: document.getElementById('k_order').value.trim() || '—',
+      Family: document.getElementById('k_fam').value.trim() || '—',
+      Genus: document.getElementById('k_gen').value.trim() || '—',
+      Species: document.getElementById('p_sci').value.trim()
+    },
+    ciri: ciriRaw.length > 0 ? ciriRaw : ["Karakteristik morfologi spesifik belum ditambahkan oleh asisten laboratorium."],
+    unik: unikRaw.length > 0 ? unikRaw : ["Fakta unik spesifik belum ditambahkan oleh asisten laboratorium."]
+  };
+
+  // Push data baru ke array runtime dan simpan permanen ke LocalStorage
+  plants.push(newPlant);
+  localStorage.setItem('flora_db', JSON.stringify(plants));
+
+  alert(`Spesies "${newPlant.name}" berhasil didaftarkan ke dalam database laboratorium!`);
+  
+  // Alihkan pandangan kembali ke Beranda utama
+  window.location.hash = '';
+}
+
+/* ===================================================
+   ACCORDION ACTION INTERACTION
+=================================================== */
+document.querySelectorAll('.accordion-header').forEach(hdr => {
+  hdr.addEventListener('click', () => {
+    const item = hdr.closest('.accordion-item');
+    const body = item.querySelector('.accordion-body');
+    const isOpen = item.classList.contains('open');
+
+    document.querySelectorAll('.accordion-item').forEach(i => {
+      i.classList.remove('open');
+      i.querySelector('.accordion-body').style.maxHeight = '0';
+    });
+
+    if(!isOpen){
+      item.classList.add('open');
+      body.style.maxHeight = body.scrollHeight + 'px';
+    }
+  });
+});
+
+/* ===================================================
+   EVENT LISTENERS SETUP
+=================================================== */
+function setupEventListeners() {
+  let searchTimer;
+  document.getElementById('searchInput').addEventListener('input', e => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+      searchQuery = e.target.value;
+      renderDashboardPage();
+    }, 160);
+  });
+
+  const themeToggle = document.getElementById('themeToggle');
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+
+  themeToggle.addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme');
+    const next = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
+  });
+}
+</script>
+</body>
+</html>
